@@ -1,3 +1,12 @@
+/** @file client.cpp
+ *  @brief This file contains client part
+ *
+ *  Now after executation it connects to 
+ *  The server using predefined credentials 
+ *  And receives the token
+ *  @author Suren G.
+ */
+
 #include <iostream>
 #include <curl/curl.h>
 
@@ -6,26 +15,7 @@ struct mem_struct {
     size_t size;
 };
  
-static size_t write_cb(void *contents, size_t size, size_t nmemb, void *userp)
-{
-    size_t realsize = size * nmemb;
-    struct mem_struct *mem = (struct mem_struct *)userp;
-    
-    char *ptr = (char*)realloc(mem->memory, mem->size + realsize + 1);
-    if(ptr == NULL) {
-        /* out of memory! */ 
-        printf("not enough memory (realloc returned NULL)\n");
-        return 0;
-    }
-    
-    mem->memory = ptr;
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-    printf("Tokenen: %s \n", mem->memory);
-    return realsize;
-}
-
+static size_t write_cb(void *contents, size_t size, size_t nmemb, void *userp);
  
 int main(void)
 {
@@ -47,8 +37,6 @@ int main(void)
         curl_easy_setopt(curl, CURLOPT_POSTFIELDS, "TEST:PASS");
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &write_cb);
 
-        // curl_easy_setopt(curl, CURLOPT_WRITEDATA, &read_buffer);
-        
         /* Perform the request, res will get the return code */ 
         res = curl_easy_perform(curl);
         /* Check for errors */ 
@@ -61,4 +49,27 @@ int main(void)
     }
     curl_global_cleanup();
     return 0;
+}
+
+
+
+
+static size_t write_cb(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    struct mem_struct *mem = (struct mem_struct *)userp;
+    
+    char *ptr = (char*)realloc(mem->memory, mem->size + realsize + 1);
+    if(ptr == NULL) {
+        /* out of memory! */ 
+        printf("not enough memory (realloc returned NULL)\n");
+        return 0;
+    }
+    
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+    printf("Tokenen: %s \n", mem->memory);
+    return realsize;
 }

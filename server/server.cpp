@@ -1,9 +1,8 @@
 /** @file server.cpp
  *  @brief This file contains http streaming server implementation
  *
- *  This contains the prototypes for the console
- *  driver and eventually any macros, constants,
- *  or global variables you will need.
+ *  This contains the http server,
+ *  Now there is no streaming impl here, progress 
  *
  *  @author Suren G.
  */
