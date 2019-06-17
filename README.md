@@ -1,4 +1,4 @@
-# client_server_streaming
+# client-server streaming
 Server: cd serve; make; ./server <br />
 Client: cd client; make; ./client
 
