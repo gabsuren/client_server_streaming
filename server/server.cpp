@@ -2,7 +2,7 @@
  *  @brief This file contains http streaming server implementation
  *
  *  This contains the http server,
- *  Now there is no streaming impl here, progress 
+ *  Now it contains only http server requests implementation
  *
  *  @author Suren G.
  */
@@ -48,7 +48,6 @@ bool verify_token(evhttp_request *req);
 
 char *srv_address = "127.0.0.1"; // Server's address
 uint16_t srv_port = 5555; // Server's port
-
 
 int main()
 {
