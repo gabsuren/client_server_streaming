@@ -1,5 +1,5 @@
-# client_server_streaming
-Server: cd serve; make; ./server
+# client-server streaming
+Server: cd serve; make; ./server <br />
 Client: cd client; make; ./client
 
 # USED LIBRARIES
