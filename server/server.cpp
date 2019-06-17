@@ -12,7 +12,6 @@
 #include <cstdint>
 #include <iostream>
 #include <evhttp.h>
-#include <jansson.h>
 
 #define USERNAME "TEST"
 #define PASSWORD "PASS"
@@ -54,7 +53,7 @@ uint16_t srv_port = 5555; // Server's port
 
 int main()
 {
-    if ( !event_init() )
+    if (!event_init())
     {
         fprintf(stderr, "Failed to init libevent.");
         return -1;
@@ -91,7 +90,7 @@ void login_req_cb(evhttp_request *req, void *)
     struct evbuffer *input_buf = evhttp_request_get_input_buffer(req);
     if (!input_buf)
     {
-        evhttp_send_reply(req, 401, "", out_buf);
+        evhttp_send_reply(req, 401, "", NULL);
         return;
     }
     
@@ -102,13 +101,14 @@ void login_req_cb(evhttp_request *req, void *)
 
     // copy POST body into your char array
     evbuffer_copyout(input_buf, data, input_len);
-
+    
+    char *username = strtok(data, ":");
     char *password = strtok(NULL, "\0"); // Split string from last find delimiter, strtok remembers last string
 
     if (strcmp(username, USERNAME) == 0 && strcmp(password, PASSWORD) == 0)
     {
         evbuffer_add_printf(out_buf, DUMMY_TOKEN);
-        evhttp_send_reply(req, HTTP_OK, "", out_buf);
+        evhttp_send_reply(req, HTTP_OK, "", NULL);
     } else 
     {
         evbuffer_add_printf(out_buf, "<html><body><center><h1>Failed!</h1></center></body></html>");
@@ -121,10 +121,14 @@ void frames_req_cb(evhttp_request *req, void *)
     struct evbuffer *input_buf = evhttp_request_get_input_buffer(req);
     if (!input_buf)
     {
-        evhttp_send_reply(req, 401, "", out_buf);
+        evhttp_send_reply(req, 401, "", NULL);
         return;
     }
-
+    if (!verify_token(req))
+    {
+        evhttp_send_reply(req, 401, "", NULL);
+        return;
+    }
     auto *out_buf = evhttp_request_get_output_buffer(req);
     if (!out_buf)
         return;
@@ -146,7 +150,7 @@ bool verify_token(evhttp_request *req)
 void print_bytes(char *str, void *buffer, size_t len, char *type)
 {
     printf("%s: ", str);
-    if( strcmp(type, "str") == 0)
+    if(strcmp(type, "str") == 0)
     {
         char *char_data = (char*)buffer;
         for(int i = 0; i < len; ++i)
@@ -154,7 +158,7 @@ void print_bytes(char *str, void *buffer, size_t len, char *type)
             printf("%s", char_data + i);
         }
     }
-    if( strcmp(type, "hex") == 0)
+    if(strcmp(type, "hex") == 0)
     {
         for(int i = 0; i < len; ++i)
         {
